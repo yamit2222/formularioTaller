@@ -1,8 +1,8 @@
 # formularioTaller
-//-Backend
-//-Frontend
-//-Arquitectura del Proyecto
-//    -Estructura del Backend
+#-Backend
+#-Frontend
+#-Arquitectura del Proyecto
+#    -Estructura del Backend
 //    -Estructura del Frontend
 //-Tecnologías(falta por definir)
 //mysql
