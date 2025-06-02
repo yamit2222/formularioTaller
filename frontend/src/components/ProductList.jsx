@@ -1,66 +1,174 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { 
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  Typography,
+  Box,
+  CircularProgress,
+  Dialog
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ProductForm from './ProductForm';
+import Swal from 'sweetalert2';
 
 export function ProductList({ refreshTrigger }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchProducts();
-  }, [refreshTrigger]);
+  const [error, setError] = useState(null);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const fetchProducts = async () => {
     try {
+      setLoading(true);
+      setError(null);
       const response = await axios.get('/api/products');
       setProducts(response.data);
     } catch (error) {
       console.error('Error al cargar productos:', error);
+      setError('No se pudieron cargar los productos');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudieron cargar los productos'
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchProducts();
+  }, [refreshTrigger]);
+
+  const handleEdit = (product) => {
+    setEditingProduct(product);
+    setOpenDialog(true);
+  };
+
   const handleDelete = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
-      try {
+    try {
+      const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: "No podrás revertir esta acción",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      });
+
+      if (result.isConfirmed) {
         await axios.delete(`/api/products/${id}`);
-        fetchProducts();
-        alert('Producto eliminado exitosamente');
-      } catch (error) {
-        alert('Error al eliminar el producto');
+        await fetchProducts(); // Recargar la lista después de eliminar
+        Swal.fire(
+          '¡Eliminado!',
+          'El producto ha sido eliminado.',
+          'success'
+        );
       }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo eliminar el producto'
+      });
     }
   };
 
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setEditingProduct(null);
+  };
+
+  const handleProductUpdated = async () => {
+    await fetchProducts();
+    handleCloseDialog();
+  };
+
   if (loading) {
-    return <div>Cargando productos...</div>;
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box textAlign="center" p={3}>
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <Box textAlign="center" p={3}>
+        <Typography>No hay productos disponibles.</Typography>
+      </Box>
+    );
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Lista de Productos</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {products.map((product) => (
-          <div key={product.id} className="bg-white p-4 rounded-lg shadow">
-            <h3 className="text-xl font-semibold">{product.name}</h3>
-            <p className="text-gray-600">{product.description}</p>
-            <div className="mt-2">
-              <p><strong>Precio:</strong> ${product.price}</p>
-              <p><strong>Stock:</strong> {product.stock}</p>
-              <p><strong>Marca:</strong> {product.brand}</p>
-              <p><strong>Categoría:</strong> {product.category}</p>
-            </div>
-            <div className="mt-4 flex justify-end space-x-2">
-              <button
-                onClick={() => handleDelete(product.id)}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-              >
-                Eliminar
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+    <>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Nombre</TableCell>
+              <TableCell>Descripción</TableCell>
+              <TableCell align="right">Precio</TableCell>
+              <TableCell align="right">Stock</TableCell>
+              <TableCell>Marca</TableCell>
+              <TableCell>Categoría</TableCell>
+              <TableCell align="center">Acciones</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {products.map((product) => (
+              <TableRow key={product.id}>
+                <TableCell>{product.name}</TableCell>
+                <TableCell>{product.description}</TableCell>
+                <TableCell align="right">${product.price}</TableCell>
+                <TableCell align="right">{product.stock}</TableCell>
+                <TableCell>{product.brand}</TableCell>
+                <TableCell>{product.category}</TableCell>
+                <TableCell align="center">
+                  <IconButton onClick={() => handleEdit(product)} color="primary">
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton onClick={() => handleDelete(product.id)} color="error">
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      <Dialog 
+        open={openDialog} 
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+      >
+        <ProductForm
+          product={editingProduct}
+          onSubmit={handleProductUpdated}
+          onCancel={handleCloseDialog}
+        />
+      </Dialog>
+    </>
   );
 }

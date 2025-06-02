@@ -1,5 +1,5 @@
-import { DataTypes } from 'sequelize';
-import { sequelize } from '../src/config/configDb.js';
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/configDb');
 
 const Product = sequelize.define('Product', {
   id: {
@@ -31,6 +31,4 @@ const Product = sequelize.define('Product', {
   }
 });
 
-// Exportar el modelo
-export { Product };
-export default Product;
+module.exports = Product;

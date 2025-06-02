@@ -1,7 +1,7 @@
-const Product = require('../models/Product');
+import { Product } from '../../models/Product.js';
 
 // Obtener todos los productos
-exports.getAllProducts = async (req, res) => {
+export const getAllProducts = async (req, res) => {
   try {
     const products = await Product.findAll();
     res.json(products);
@@ -11,7 +11,7 @@ exports.getAllProducts = async (req, res) => {
 };
 
 // Crear un nuevo producto
-exports.createProduct = async (req, res) => {
+export const createProduct = async (req, res) => {
   try {
     const product = await Product.create(req.body);
     res.status(201).json(product);
@@ -21,7 +21,7 @@ exports.createProduct = async (req, res) => {
 };
 
 // Actualizar un producto
-exports.updateProduct = async (req, res) => {
+export const updateProduct = async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id);
     if (product) {
@@ -36,7 +36,7 @@ exports.updateProduct = async (req, res) => {
 };
 
 // Eliminar un producto
-exports.deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id);
     if (product) {

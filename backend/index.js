@@ -1,7 +1,7 @@
-const express = require('express');
-const cors = require('cors');
-const { sequelize, connectWithRetry } = require('./config/database');
-const productRoutes = require('./routes/productRoutes');
+import express from 'express';
+import cors from 'cors';
+import { sequelize, connectWithRetry } from './src/config/configDb.js';
+import productRoutes from './src/routes/productRoutes.js';
 
 const app = express();
 
