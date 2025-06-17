@@ -36,10 +36,10 @@ const ProductForm = ({ product, onSubmit, onCancel, onProductAdded }) => {
     e.preventDefault();
     try {
       if (product) {
-        // Update existing product
+        
         await axios.put(`/api/products/${product.id}`, formData);
       } else {
-        // Create new product
+        
         await axios.post('/api/products', formData);
       }
       setFormData({
@@ -122,12 +122,13 @@ const ProductForm = ({ product, onSubmit, onCancel, onProductAdded }) => {
               value={formData.category}
               onChange={handleChange}
             />
-          </Grid>
-          <Grid item xs={12}>
+          </Grid>          <Grid item xs={12}>
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-              <Button type="button" onClick={onCancel}>
-                Cancelar
-              </Button>
+              {product && (
+                <Button type="button" onClick={onCancel}>
+                  Cancelar
+                </Button>
+              )}
               <Button type="submit" variant="contained" color="primary">
                 {product ? 'Actualizar' : 'Crear'}
               </Button>

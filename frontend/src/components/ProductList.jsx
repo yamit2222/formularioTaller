@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-export function ProductList({ refreshTrigger }) {
+export function ProductList({ refreshTrigger, onEdit }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -49,8 +49,13 @@ export function ProductList({ refreshTrigger }) {
               <p><strong>Stock:</strong> {product.stock}</p>
               <p><strong>Marca:</strong> {product.brand}</p>
               <p><strong>Categoría:</strong> {product.category}</p>
-            </div>
-            <div className="mt-4 flex justify-end space-x-2">
+            </div>            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                onClick={() => onEdit(product)}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Editar
+              </button>
               <button
                 onClick={() => handleDelete(product.id)}
                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
