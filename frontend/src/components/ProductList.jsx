@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import productService from '../services/product.service';
 
 export function ProductList({ refreshTrigger }) {
   const [products, setProducts] = useState([]);
@@ -7,23 +7,19 @@ export function ProductList({ refreshTrigger }) {
 
   useEffect(() => {
     fetchProducts();
-  }, [refreshTrigger]);
-
-  const fetchProducts = async () => {
+  }, [refreshTrigger]);  const fetchProducts = async () => {
     try {
-      const response = await axios.get('/api/products');
-      setProducts(response.data);
+      const products = await productService.getAll();
+      setProducts(products);
     } catch (error) {
       console.error('Error al cargar productos:', error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDelete = async (id) => {
+  };  const handleDelete = async (id) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
       try {
-        await axios.delete(`/api/products/${id}`);
+        await productService.delete(id);
         fetchProducts();
         alert('Producto eliminado exitosamente');
       } catch (error) {

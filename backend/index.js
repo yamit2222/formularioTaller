@@ -7,7 +7,12 @@ import apiRoutes from './routes/index.routes.js';
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:5175'], // URLs específicas del frontend
+  credentials: true, // Permite cookies y credenciales
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Rutas principales

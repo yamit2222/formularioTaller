@@ -15,33 +15,21 @@ instance.interceptors.request.use(
   (config) => {
     const token = cookies.get('jwt-auth', { path: '/' });
     if(token) {
-      console.log('Token encontrado en cookies, añadiendo a la cabecera Authorization');
       config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      console.warn('No se encontró token JWT en cookies. La solicitud podría fallar si la ruta está protegida.');
     }
-    
-    // Mostrar información de la solicitud para depuración
-    console.log(`[API Request] ${config.method.toUpperCase()} ${config.url}`);
     return config;
   },
-  (error) => {
-    console.error('Error en interceptor de solicitud:', error);
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Interceptor de respuesta para debugging
+// Interceptor de respuesta para manejar errores
 instance.interceptors.response.use(
-  (response) => {
-    console.log(`[API Response] ${response.status} para ${response.config.url}`);
-    return response;
-  },
+  (response) => response,
   (error) => {
-    if (error.response) {
-      console.error(`[API Error] ${error.response.status} para ${error.config.url}:`, error.response.data);
-    } else {
-      console.error('[API Error] Sin respuesta del servidor:', error.message);
+    if (error.response?.status === 401) {
+      // Token expirado o inválido
+      cookies.remove('jwt-auth', { path: '/' });
+      console.warn('Token expirado. Redirigir al login.');
     }
     return Promise.reject(error);
   }

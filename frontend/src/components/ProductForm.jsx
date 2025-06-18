@@ -6,7 +6,7 @@ import {
   Grid,
   Paper
 } from '@mui/material';
-import axios from 'axios';
+import productService from '../services/product.service.js';
 
 const ProductForm = ({ product, onSubmit, onCancel, onProductAdded }) => {
   const [formData, setFormData] = useState({
@@ -30,17 +30,15 @@ const ProductForm = ({ product, onSubmit, onCancel, onProductAdded }) => {
       ...prev,
       [name]: value
     }));
-  };
-
-  const handleSubmit = async (e) => {
+  };  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (product) {
-        
-        await axios.put(`/api/products/${product.id}`, formData);
+        // Actualizar producto existente
+        await productService.update(product.id, formData);
       } else {
-        
-        await axios.post('/api/products', formData);
+        // Crear nuevo producto
+        await productService.create(formData);
       }
       setFormData({
         name: '',
