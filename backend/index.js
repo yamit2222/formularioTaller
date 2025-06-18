@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { sequelize, connectDB } from './config/Configdb.js';
 import { PORT } from './config/confidenv.js';
-import productRoutes from './routes/productRoutes.js';
+import apiRoutes from './routes/index.routes.js';
 
 const app = express();
 
@@ -10,12 +10,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Rutas
-app.use('/api/products', productRoutes);
+// Rutas principales
+app.use('/api', apiRoutes);
 
-// Ruta básica
+// Ruta básica de bienvenida
 app.get('/', (req, res) => {
-  res.json({ message: 'API de Lubricentro funcionando correctamente' });
+  res.json({ 
+    message: 'Bienvenido al API de Lubricentro',
+    documentation: '/api',
+    health: '/api/health'
+  });
 });
 
 const startServer = async () => {
