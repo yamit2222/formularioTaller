@@ -1,12 +1,16 @@
 const { Sequelize } = require('sequelize');
+require('dotenv').config({ path: './config/.env' });
 
+// Configuración de Sequelize para MySQL
 const sequelize = new Sequelize(
-  process.env.DB_NAME || 'lubricentro',
-  process.env.DB_USER || 'root',
-  process.env.DB_PASSWORD || 'rootpass',
+  process.env.DATABASE || 'ysoto_bd',
+  process.env.DB_USERNAME || 'ysoto',
+  process.env.PASSWORD || 'ysoto2025',
   {
-    host: process.env.DB_HOST || 'db',
+    host: process.env.HOST || 'localhost',
+    port: process.env.DB_PORT || 3306,
     dialect: 'mysql',
+    logging: process.env.NODE_ENV === 'development' ? console.log : false,
     retry: {
       max: 10,
       match: [
@@ -28,20 +32,28 @@ const sequelize = new Sequelize(
   }
 );
 
+// Función para conectar a la base de datos con reintentos
 const connectWithRetry = async () => {
   let retries = 5;
+  
   while (retries) {
     try {
       await sequelize.authenticate();
-      console.log('Database connection has been established successfully.');
+      console.log('✅ Conexión exitosa a la base de datos MySQL!');
       return sequelize;
     } catch (error) {
       retries -= 1;
-      console.log(`Failed to connect to database. Retries left: ${retries}`);
+      console.log(`❌ Error al conectar. Reintentos restantes: ${retries}`);
+      console.error('Error:', error.message);
+      
+      if (retries === 0) {
+        throw new Error('No se pudo conectar a la base de datos después de múltiples intentos');
+      }
+      
+      // Esperar 5 segundos antes del siguiente intento
       await new Promise(resolve => setTimeout(resolve, 5000));
     }
   }
-  throw new Error('Unable to connect to the database after multiple retries');
 };
 
 module.exports = { sequelize, connectWithRetry };

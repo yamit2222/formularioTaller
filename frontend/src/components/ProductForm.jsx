@@ -122,13 +122,12 @@ const ProductForm = ({ product, onSubmit, onCancel, onProductAdded }) => {
               value={formData.category}
               onChange={handleChange}
             />
-          </Grid>          <Grid item xs={12}>
+          </Grid>
+          <Grid item xs={12}>
             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-              {product && (
-                <Button type="button" onClick={onCancel}>
-                  Cancelar
-                </Button>
-              )}
+              <Button type="button" onClick={onCancel}>
+                Cancelar
+              </Button>
               <Button type="submit" variant="contained" color="primary">
                 {product ? 'Actualizar' : 'Crear'}
               </Button>
