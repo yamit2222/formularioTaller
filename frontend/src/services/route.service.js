@@ -1,7 +1,8 @@
 import axios from 'axios';
 import cookies from 'js-cookie';
 
-const API_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api';
+// En desarrollo, usa el proxy de Vite (/api), en producción usa la URL completa
+const API_URL = import.meta.env.DEV ? '/api' : (import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api');
 
 const instance = axios.create({
   baseURL: API_URL,
@@ -22,14 +23,14 @@ instance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Interceptor de respuesta para manejar errores
+// Interceptor de respuesta para manejar errores globalmente
 instance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       // Token expirado o inválido
       cookies.remove('jwt-auth', { path: '/' });
-      console.warn('Token expirado. Redirigir al login.');
+      // Opcional: redirigir a login
     }
     return Promise.reject(error);
   }

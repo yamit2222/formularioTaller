@@ -6,13 +6,20 @@ import apiRoutes from './routes/index.routes.js';
 
 const app = express();
 
-// Middlewares
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5175'], // URLs específicas del frontend
-  credentials: true, // Permite cookies y credenciales
+// Configuración de CORS
+const corsOptions = {
+  origin: [
+    'http://localhost:5173',  // Puerto de desarrollo de Vite
+    'http://localhost:443',   // Puerto de preview
+    'https://localhost:443'   // Para conexiones HTTPS si es necesario
+  ],
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-}));
+};
+
+// Middlewares
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Rutas principales
